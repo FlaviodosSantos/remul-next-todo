@@ -40,8 +40,12 @@ const Home: NextPage = () => {
           };
 
           const saveTask = async () => {
-            const savedTask = await remult.repo(Task).save(task);
-            setTasks(tasks.map((t) => (t === task ? savedTask : t)));
+            try {
+              const savedTask = await remult.repo(Task).save(task);
+              setTasks(tasks.map((t) => (t === task ? savedTask : t)));
+            } catch (error) {
+              alert(error.message);
+            }
           };
 
           const deleteTask = async () => {
