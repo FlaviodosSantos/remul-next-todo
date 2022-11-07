@@ -23,6 +23,15 @@ const Home: NextPage = () => {
     setTasks([...tasks, new Task()]);
   };
 
+  const setAll = async (completed: boolean) => {
+    const taskRepo = remult.repo(Task);
+
+    for (const task of await taskRepo.find()) {
+      await taskRepo.save({ ...task, completed });
+    }
+    setTasks(await fetchTasks(hideCompleted));
+  };
+
   return (
     <div>
       <input
@@ -71,6 +80,10 @@ const Home: NextPage = () => {
         })}
       </main>
       <button onClick={addTask}>Add Task</button>
+      <div>
+        <button onClick={() => setAll(true)}>Set all as completed</button>
+        <button onClick={() => setAll(false)}>Set all as uncompleted</button>
+      </div>
     </div>
   );
 };
