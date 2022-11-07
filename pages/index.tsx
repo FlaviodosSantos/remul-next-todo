@@ -18,6 +18,11 @@ const Home: NextPage = () => {
   useEffect(() => {
     fetchTasks(hideCompleted).then(setTasks);
   }, [hideCompleted]);
+
+  const addTask = () => {
+    setTasks([...tasks, new Task()]);
+  };
+
   return (
     <div>
       <input
@@ -27,13 +32,41 @@ const Home: NextPage = () => {
       />
       Hide Completed
       <main>
-        {tasks.map((task) => (
-          <div key={task.id}>
-            <input type="checkbox" checked={task.completed} />
-            {task.title}
-          </div>
-        ))}
+        {tasks.map((task) => {
+          const handleChange = (values: Partial<Task>) => {
+            setTasks(
+              tasks.map((t) => (t === task ? { ...task, ...values } : t))
+            );
+          };
+
+          const saveTask = async () => {
+            const savedTask = await remult.repo(Task).save(task);
+            setTasks(tasks.map((t) => (t === task ? savedTask : t)));
+          };
+
+          const deleteTask = async () => {
+            await remult.repo(Task).delete(task);
+            setTasks(tasks.filter((t) => t !== task));
+          };
+
+          return (
+            <div key={task.id}>
+              <input
+                type="checkbox"
+                checked={task.completed}
+                onChange={(e) => handleChange({ completed: e.target.checked })}
+              />
+              <input
+                value={task.title}
+                onChange={(e) => handleChange({ title: e.target.value })}
+              />
+              <button onClick={saveTask}>Save</button>
+              <button onClick={deleteTask}>Delete</button>
+            </div>
+          );
+        })}
       </main>
+      <button onClick={addTask}>Add Task</button>
     </div>
   );
 };
