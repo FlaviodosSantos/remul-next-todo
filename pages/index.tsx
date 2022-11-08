@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { remult } from "remult";
 import { Task } from "../src/shared/Task";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { TasksController } from "../src/shared/TasksController";
 
 async function fetchTasks(hideCompleted: boolean) {
-  const taskRepo = remult.repo(Task);
+  //const taskRepo = remult.repo(Task);
 
-  if (!taskRepo.metadata.apiReadAllowed) return [];
+  //if (!taskRepo.metadata.apiReadAllowed) return [];
+  //if (!remult.repo(Task).metadata.apiReadAllowed) return [];
 
   return remult.repo(Task).find({
     limit: 20,
@@ -35,6 +37,7 @@ const Home: NextPage = () => {
     for (const task of await taskRepo.find()) {
       await taskRepo.save({ ...task, completed });
     }
+    //await TasksController.setAll(completed);
     setTasks(await fetchTasks(hideCompleted));
   };
 
@@ -69,7 +72,7 @@ const Home: NextPage = () => {
               const savedTask = await remult.repo(Task).save(task);
               setTasks(tasks.map((t) => (t === task ? savedTask : t)));
             } catch (error) {
-              alert(error.message);
+              alert(error);
             }
           };
 

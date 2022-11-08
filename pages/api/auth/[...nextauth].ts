@@ -1,8 +1,12 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+import { NextApiRequest } from "next";
+import { getToken } from "next-auth/jwt";
+import { Roles } from "../../../src/shared/Roles";
+
 const validUsers = [
-  { id: "1", name: "Jane", roles: ["admin"] },
+  { id: "1", name: "Jane", roles: [Roles.admin] },
   { id: "2", name: "Steve", roles: [] },
 ];
 
@@ -28,3 +32,8 @@ export default NextAuth({
   ],
   secret: secret,
 });
+
+export async function getUserFromNextAuth(req: NextApiRequest) {
+  const token = await getToken({ req, secret }); // import getToken from 'next-auth/jwt'
+  return validUsers.find((u) => u.id === token?.sub);
+}

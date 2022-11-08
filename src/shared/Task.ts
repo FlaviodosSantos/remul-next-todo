@@ -1,16 +1,19 @@
 import { Allow, Entity, Fields, Validators } from "remult";
+import { Roles } from "./Roles";
 
-@Entity("tasks", {
-  allowApiCrud: Allow.authenticated,
+@Entity<Task>("tasks", {
+  allowApiRead: Allow.authenticated,
+  allowApiUpdate: Allow.authenticated,
+  allowApiInsert: Roles.admin,
+  allowApiDelete: Roles.admin,
 })
 export class Task {
   @Fields.uuid()
   id!: string;
 
-  @Fields.string<Task>({
-    validate: (task) => {
-      if (task.title.length < 3) throw "Erro: Titulo vazio !";
-    },
+  @Fields.string({
+    validate: Validators.required,
+    allowApiUpdate: Roles.admin,
   })
   title = "";
 
