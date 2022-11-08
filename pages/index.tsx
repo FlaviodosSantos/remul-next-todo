@@ -2,8 +2,13 @@ import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { remult } from "remult";
 import { Task } from "../src/shared/Task";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 async function fetchTasks(hideCompleted: boolean) {
+  const taskRepo = remult.repo(Task);
+
+  if (!taskRepo.metadata.apiReadAllowed) return [];
+
   return remult.repo(Task).find({
     limit: 20,
     orderBy: { completed: "asc" },
@@ -14,6 +19,7 @@ async function fetchTasks(hideCompleted: boolean) {
 const Home: NextPage = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [hideCompleted, setHideCompleted] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
     fetchTasks(hideCompleted).then(setTasks);
@@ -34,6 +40,16 @@ const Home: NextPage = () => {
 
   return (
     <div>
+      <header>
+        {session ? (
+          <>
+            Hello {session?.user?.name}{" "}
+            <button onClick={() => signOut()}>Sign Out</button>
+          </>
+        ) : (
+          <button onClick={() => signIn()}>Sign In</button>
+        )}
+      </header>
       <input
         type="checkbox"
         checked={hideCompleted}
